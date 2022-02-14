@@ -9,14 +9,7 @@ import java.awt.*;
 import java.awt.datatransfer.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseWheelEvent;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.EOFException;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.URL;
@@ -12539,91 +12532,120 @@ public class Game extends RSApplet {
 		this.anInt1187 += (j << 1);
 	}
 
+	public static String removeLastChar(String s) {
+		return (s == null || s.length() == 0)
+				? null
+				: (s.substring(0, s.length() - 1));
+	}
+
 	public void keyPressed(KeyEvent keyevent)
 	{
-		super.keyPressed(keyevent);
-		switch (keyevent.getKeyCode())
-		{
-			case KeyEvent.VK_ESCAPE:
-				closeOpenInterfaces();
-				break;
-			case KeyEvent.VK_F1:
-				needDrawTabArea = true;
-				tabID = 3;
-				tabAreaAltered = true;
-				break;
-			case KeyEvent.VK_F2:
-				needDrawTabArea = true;
-				tabID = 4;
-				tabAreaAltered = true;
-				break;
-			case KeyEvent.VK_F3:
-				needDrawTabArea = true;
-				tabID = 5;
-				tabAreaAltered = true;
-				break;
-			case KeyEvent.VK_F4:
-				needDrawTabArea = true;
-				tabID = 6;
-				tabAreaAltered = true;
-				break;
-			case KeyEvent.VK_F5:
-				needDrawTabArea = true;
-				tabID = 0;
-				tabAreaAltered = true;
-				break;
-			case KeyEvent.VK_F6:
-				needDrawTabArea = true;
-				tabID = 1;
-				tabAreaAltered = true;
-				break;
-			case KeyEvent.VK_F7:
-				needDrawTabArea = true;
-				tabID = 2;
-				tabAreaAltered = true;
-				break;
-			case KeyEvent.VK_F8:
-				needDrawTabArea = true;
-				tabID = 8;
-				tabAreaAltered = true;
-				break;
-			case KeyEvent.VK_F9:
-				needDrawTabArea = true;
-				tabID = 11;
-				tabAreaAltered = true;
-				break;
-			case KeyEvent.VK_F10:
-				needDrawTabArea = true;
-				tabID = 12;
-				tabAreaAltered = true;
-				break;
-			case KeyEvent.VK_F11:
-				needDrawTabArea = true;
-				tabID = 13;
-				tabAreaAltered = true;
-				break;
-			case KeyEvent.VK_F12:
-				needDrawTabArea = true;
-				tabID = 10;
-				tabAreaAltered = true;
-				break;
-			case KeyEvent.VK_PAGE_UP:
-				if (zoom > -1)
-					zoom--;
-				break;
-			case KeyEvent.VK_PAGE_DOWN:
-				if (zoom < (WorldController.drawDistance / 3))
-					zoom++;
-				break;
-			case KeyEvent.VK_V:
-				if (keyevent.isControlDown()) {
-					inputString += getClipBoard();
-					if (inputString.length() > 80) {
-						inputString = inputString.substring(0, 80);
+		// downthecrop giga hack
+		System.out.println("GOT KEYCODE: "+keyevent.getKeyCode());
+		System.out.println("GOT Char: "+(char)keyevent.getKeyCode());
+		// Skipped keycodes
+		switch(keyevent.getKeyCode()){
+			case 120:
+			case 121:
+				return;
+		}
+		if(!loggedIn && keyevent.getKeyCode() == 8){
+			if(loginScreenCursorPos == 0)
+				myUsername = removeLastChar(myUsername);
+			else
+				myPassword = removeLastChar(myPassword);
+		} else if(!loggedIn && loginScreenCursorPos == 0){
+			Character c = (char)keyevent.getKeyCode();
+			c = Character.toLowerCase(c);
+			myUsername += c;
+		} else if (!loggedIn && loginScreenCursorPos == 1){
+			Character c = (char)keyevent.getKeyCode();
+			c = Character.toLowerCase(c);
+			myPassword += c;
+		} else {
+			super.keyPressed(keyevent);
+			switch (keyevent.getKeyCode()) {
+				case KeyEvent.VK_ESCAPE:
+					closeOpenInterfaces();
+					break;
+				case KeyEvent.VK_F1:
+					needDrawTabArea = true;
+					tabID = 3;
+					tabAreaAltered = true;
+					break;
+				case KeyEvent.VK_F2:
+					needDrawTabArea = true;
+					tabID = 4;
+					tabAreaAltered = true;
+					break;
+				case KeyEvent.VK_F3:
+					needDrawTabArea = true;
+					tabID = 5;
+					tabAreaAltered = true;
+					break;
+				case KeyEvent.VK_F4:
+					needDrawTabArea = true;
+					tabID = 6;
+					tabAreaAltered = true;
+					break;
+				case KeyEvent.VK_F5:
+					needDrawTabArea = true;
+					tabID = 0;
+					tabAreaAltered = true;
+					break;
+				case KeyEvent.VK_F6:
+					needDrawTabArea = true;
+					tabID = 1;
+					tabAreaAltered = true;
+					break;
+				case KeyEvent.VK_F7:
+					needDrawTabArea = true;
+					tabID = 2;
+					tabAreaAltered = true;
+					break;
+				case KeyEvent.VK_F8:
+					needDrawTabArea = true;
+					tabID = 8;
+					tabAreaAltered = true;
+					break;
+				case KeyEvent.VK_F9:
+					needDrawTabArea = true;
+					tabID = 11;
+					tabAreaAltered = true;
+					break;
+				case KeyEvent.VK_F10:
+					needDrawTabArea = true;
+					tabID = 12;
+					tabAreaAltered = true;
+					break;
+				case KeyEvent.VK_F11:
+					needDrawTabArea = true;
+					tabID = 13;
+					tabAreaAltered = true;
+					break;
+				case KeyEvent.VK_F12:
+					needDrawTabArea = true;
+					tabID = 10;
+					tabAreaAltered = true;
+					break;
+				case KeyEvent.VK_PAGE_UP:
+					if (zoom > -1)
+						zoom--;
+					break;
+				case KeyEvent.VK_PAGE_DOWN:
+					if (zoom < (WorldController.drawDistance / 3))
+						zoom++;
+					break;
+				case KeyEvent.VK_V:
+					System.out.println("Debug: hit");
+					if (keyevent.isControlDown()) {
+						inputString += getClipBoard();
+						if (inputString.length() > 80) {
+							inputString = inputString.substring(0, 80);
+						}
+						inputTaken = true;
 					}
-					inputTaken = true;
-				}
-
+			}
 		}
 	}
 

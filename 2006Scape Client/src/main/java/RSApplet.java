@@ -46,12 +46,15 @@ public class RSApplet extends Applet implements Runnable, MouseListener, MouseWh
 	@Override
 	public void run() {
 		getGameComponent().addMouseListener(this);
+		//getGameComponent().addKeyListener(this);
 		getGameComponent().addMouseMotionListener(this);
 		getGameComponent().addMouseWheelListener(this);
-		getGameComponent().addKeyListener(this);
 		getGameComponent().addFocusListener(this);
 		if (gameFrame != null) {
+			gameFrame.addMouseListener(this);
+			gameFrame.addKeyListener(this);
 			gameFrame.addWindowListener(this);
+			gameFrame.addFocusListener(this);
 		}
 		drawLoadingText(0, "Loading...");
 		startUp();
